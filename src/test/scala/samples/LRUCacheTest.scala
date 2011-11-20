@@ -99,4 +99,17 @@ class LRUCacheTest extends FunSuite with ShouldMatchers {
     Thread.sleep(200)
     cache.size() should be (0)
   }
+  test("multithread put/get safe") {
+	var cache = new LRUCache(100, 100)
+	val threads = new Array[CacheThread](10)
+	for (i <- 0 to 9) {
+	  threads(i) = new CacheThread(cache, (i + 1) * 8, 50)
+	  threads(i).start()
+	}
+	for (i <- 0 to 9) {
+	  threads(i).join()
+	}
+	Thread.sleep(100)
+	cache.size() should be (0)
+  }
 }
